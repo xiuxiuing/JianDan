@@ -45,7 +45,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Constant
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        JDApplication.getRefWatcher(this).watch(this);
         RequestManager.cancelAll(this);
     }
 

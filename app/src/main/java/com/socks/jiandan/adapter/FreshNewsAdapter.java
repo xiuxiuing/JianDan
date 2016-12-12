@@ -61,8 +61,7 @@ public class FreshNewsAdapter extends RecyclerView.Adapter<FreshNewsAdapter.View
 
     private void setAnimation(View viewToAnimate, int position) {
         if (position > lastPosition) {
-            Animation animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), R
-                    .anim.item_bottom_in);
+            Animation animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), R.anim.item_bottom_in);
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         }
@@ -81,8 +80,7 @@ public class FreshNewsAdapter extends RecyclerView.Adapter<FreshNewsAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int layoutId = isLargeMode ? R.layout.item_fresh_news : R.layout.item_fresh_news_small;
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(layoutId, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
         return new ViewHolder(v);
     }
 
@@ -91,11 +89,13 @@ public class FreshNewsAdapter extends RecyclerView.Adapter<FreshNewsAdapter.View
 
         final FreshNews freshNews = mFreshNews.get(position);
 
-        ImageLoadProxy.displayImage(freshNews.getCustomFields().getThumb_m(), holder.img, options);
+        if (freshNews.getCustomFields() != null) {
+            ImageLoadProxy.displayImage(freshNews.getCustomFields().getThumb_m(), holder.img, options);
+            holder.tv_views.setText("评论" + freshNews.getComment_count() + "次");
+        }
         holder.tv_title.setText(freshNews.getTitle());
-        holder.tv_info.setText(freshNews.getAuthor().getName() + "@" + freshNews.getTags()
-                .getTitle());
-        holder.tv_views.setText("浏览" + freshNews.getCustomFields().getViews() + "次");
+        holder.tv_info.setText(freshNews.getAuthor().getName() + "@" + freshNews.getTags().getTitle());
+
 
         if (isLargeMode) {
             holder.tv_share.setOnClickListener(new View.OnClickListener() {
@@ -150,26 +150,24 @@ public class FreshNewsAdapter extends RecyclerView.Adapter<FreshNewsAdapter.View
     private void loadDataByNetworkType() {
 
         if (NetWorkUtil.isNetWorkConnected(mActivity)) {
-            RequestManager.addRequest(new Request4FreshNews(FreshNews.getUrlFreshNews(page),
-                    new Response.Listener<ArrayList<FreshNews>>() {
-                        @Override
-                        public void onResponse(ArrayList<FreshNews> response) {
+            RequestManager.addRequest(new Request4FreshNews(FreshNews.getUrlFreshNews(page), new Response.Listener<ArrayList<FreshNews>>() {
+                @Override
+                public void onResponse(ArrayList<FreshNews> response) {
 
-                            mLoadResultCallBack.onSuccess(LoadResultCallBack.SUCCESS_OK, null);
-                            mLoadFinisCallBack.loadFinish(null);
+                    mLoadResultCallBack.onSuccess(LoadResultCallBack.SUCCESS_OK, null);
+                    mLoadFinisCallBack.loadFinish(null);
 
-                            if (page == 1) {
-                                mFreshNews.clear();
-                                FreshNewsCache.getInstance(mActivity).clearAllCache();
-                            }
+                    if (page == 1) {
+                        mFreshNews.clear();
+                        FreshNewsCache.getInstance(mActivity).clearAllCache();
+                    }
 
-                            mFreshNews.addAll(response);
-                            notifyDataSetChanged();
+                    mFreshNews.addAll(response);
+                    notifyDataSetChanged();
 
-                            FreshNewsCache.getInstance(mActivity).addResultCache(JSONParser.toString(response),
-                                    page);
-                        }
-                    }, new Response.ErrorListener() {
+                    FreshNewsCache.getInstance(mActivity).addResultCache(JSONParser.toString(response), page);
+                }
+            }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mLoadResultCallBack.onError(LoadResultCallBack.ERROR_NET, error.getMessage());

@@ -13,8 +13,6 @@ import com.socks.jiandan.utils.StrictModeUtil;
 import com.socks.jiandan.utils.logger.LogLevel;
 import com.socks.jiandan.utils.logger.Logger;
 import com.socks.jiandan.view.imageloader.ImageLoadProxy;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
 
 public class JDApplication extends Application {
 
@@ -25,13 +23,12 @@ public class JDApplication extends Application {
     private static DaoMaster daoMaster;
     private static DaoSession daoSession;
 
-    private RefWatcher refWatcher;
+
 
     @Override
     public void onCreate() {
         StrictModeUtil.init();
         super.onCreate();
-        refWatcher = LeakCanary.install(this);
         mContext = this;
         ImageLoadProxy.initImageLoader(this);
 
@@ -42,11 +39,6 @@ public class JDApplication extends Application {
 
     public static Context getContext() {
         return mContext;
-    }
-
-    public static RefWatcher getRefWatcher(Context context) {
-        JDApplication application = (JDApplication) context.getApplicationContext();
-        return application.refWatcher;
     }
 
 
